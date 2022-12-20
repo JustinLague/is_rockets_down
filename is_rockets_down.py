@@ -42,8 +42,7 @@ if __name__ == '__main__':
     cronitor.Monitor.put(
         key='is-rockets-down',
         type='job',
-        schedule='0 0 * * *',
-        notify='slack:devops-alerts'
+        schedule='*/5 * * * *',
     )
 
     ping_site()
