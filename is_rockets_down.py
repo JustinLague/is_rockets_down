@@ -1,9 +1,10 @@
 import smtplib, ssl
 import os
 from dotenv import load_dotenv
+import cronitor
+import requests
 load_dotenv()
 
-import requests
 
 def send_email(site):
     port = 465  # For SSL
@@ -21,7 +22,8 @@ def send_email(site):
         server.sendmail("isrocketsdown@gmail.com", "justin.lague.jl@gmail.com", message)
         print("email")
 
-if __name__ == '__main__':
+@cronitor.job('is-rockets-down')
+def ping_site():
     url = 'https://clubrockets.com/'
     r = requests.get(url)
 
@@ -33,3 +35,15 @@ if __name__ == '__main__':
 
     if(r.status_code != 200):
         send_email(".ca")
+
+if __name__ == '__main__':
+    cronitor.api_key = os.getenv('API_CRONITOR')
+
+    cronitor.Monitor.put(
+        key='is-rockets-down',
+        type='job',
+        schedule='0 0 * * *',
+        notify='slack:devops-alerts'
+    )
+
+    ping_site()
